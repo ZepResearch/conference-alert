@@ -1,9 +1,13 @@
-import { Inter } from "next/font/google"
+import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
 import { Toaster } from "@/components/ui/toaster"
 
-const inter = Inter({ subsets: ["latin"] })
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
+  subsets: ["latin"],
+});
+
 
 export const metadata = {
   title: "Conference Alert - Discover Academic Conferences",
@@ -13,7 +17,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${bricolage.variable} antialiased `}>
         <AuthProvider>
           {children}
           <Toaster />

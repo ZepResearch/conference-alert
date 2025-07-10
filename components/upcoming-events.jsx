@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, MapPin, Clock, Users, ArrowRight } from "lucide-react"
+import { Calendar, MapPin, ArrowRight, Sparkles } from "lucide-react"
 import pocketbase from "@/lib/pocketbase"
 import { createSlug } from "@/lib/search-utils"
 
@@ -22,9 +22,7 @@ export function UpcomingEvents() {
       // Get upcoming accepted events
       const today = new Date().toISOString().split("T")[0]
       const filter = `status = "accepted" && event_start_date >= "${today}"`
-
-      const result = await pocketbase.searchEvents(filter, 1, 6)
-
+      const result = await pocketbase.searchEvents(filter, 1, 4)
       if (result.success) {
         setEvents(result.events.items)
       }
@@ -45,14 +43,14 @@ export function UpcomingEvents() {
 
   const getEventTypeColor = (type) => {
     const colors = {
-      Conference: "bg-blue-100 text-blue-800",
-      Seminar: "bg-green-100 text-green-800",
-      Workshop: "bg-purple-100 text-purple-800",
-      Webinar: "bg-orange-100 text-orange-800",
-      "Continuing professional development event": "bg-red-100 text-red-800",
-      "Online conference": "bg-indigo-100 text-indigo-800",
+      Conference: "from-blue-500 to-blue-600",
+      Seminar: "from-emerald-500 to-emerald-600",
+      Workshop: "from-purple-500 to-purple-600",
+      Webinar: "from-orange-500 to-orange-600",
+      "Continuing professional development event": "from-red-500 to-red-600",
+      "Online conference": "from-indigo-500 to-indigo-600",
     }
-    return colors[type] || "bg-gray-100 text-gray-800"
+    return colors[type] || "from-gray-500 to-gray-600"
   }
 
   const getThumbnailUrl = (event) => {
@@ -66,147 +64,238 @@ export function UpcomingEvents() {
     return `${createSlug(event.event_name)}-${event.id}`
   }
 
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {[...Array(6)].map((_, index) => (
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: index * 0.1 }}
+          className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 overflow-hidden"
+        >
+          <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
+          <div className="p-6 space-y-4">
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse" />
+              <div className="h-3 bg-gray-200 rounded w-2/3 animate-pulse" />
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  )
+
   if (loading) {
     return (
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-extrabold text-gray-900">Upcoming Events & Conferences</h3>
-            <p className="mt-4 text-lg text-gray-600">Discover the latest academic events happening soon</p>
-          </div>
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-          </div>
+      <section className="py-20 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0  bg-white" />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY }}
+          className="absolute top-20 right-10 w-40 h-40 bg-blue-200/20 rounded-full blur-xl"
+        />
+
+        <div className="relative z-10 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h3 className="text-4xl font-light text-gray-900 mb-4">
+              Upcoming Events &{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-medium">
+                Conferences
+              </span>
+            </h3>
+            <p className="text-xl text-gray-600 font-light max-w-2xl mx-auto">
+              Discover the latest academic events happening soon
+            </p>
+          </motion.div>
+          <LoadingSkeleton />
         </div>
       </section>
     )
   }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h3 className="text-3xl font-extrabold text-gray-900">Upcoming Events & Conferences</h3>
-          <p className="mt-4 text-lg text-gray-600">Discover the latest academic events happening soon</p>
-        </div>
+    <section className="py-20 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-white" />
+      <motion.div
+        animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+        transition={{ duration: 8, repeat: Number.POSITIVE_INFINITY }}
+        className="absolute top-20 right-10 w-40 h-40 bg-blue-200/20 rounded-full blur-xl"
+      />
+      <motion.div
+        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+        transition={{ duration: 10, repeat: Number.POSITIVE_INFINITY, delay: 2 }}
+        className="absolute bottom-20 left-10 w-32 h-32 bg-purple-200/15 rounded-full blur-xl"
+      />
+
+      <div className="relative z-10 max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <h3 className="text-4xl font-light text-gray-900 mb-4">
+            Upcoming Events &{" "}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent font-medium">
+              Conferences
+            </span>
+          </h3>
+          <p className="text-xl text-gray-600 font-light max-w-2xl mx-auto">
+            Discover the latest academic events happening soon
+          </p>
+        </motion.div>
 
         {events.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h4 className="text-lg font-medium text-gray-900 mb-2">No upcoming events</h4>
-            <p className="text-gray-600">Check back soon for new events!</p>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center py-16"
+          >
+            <div className="bg-white/60 backdrop-blur-sm rounded-3xl border border-white/30 p-12 max-w-md mx-auto">
+              <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+              <h4 className="text-xl font-medium text-gray-900 mb-3">No upcoming events</h4>
+              <p className="text-gray-600 font-light">Check back soon for new events!</p>
+            </div>
+          </motion.div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {events.map((event) => {
-                const thumbnailUrl = getThumbnailUrl(event)
-                const eventSlug = generateEventSlug(event)
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+              <AnimatePresence>
+                {events.map((event, index) => {
+                  const thumbnailUrl = getThumbnailUrl(event)
+                  const eventSlug = generateEventSlug(event)
+                  const gradientClass = getEventTypeColor(event.event_type)
 
-                return (
-                  <Link key={event.id} href={`/event/${eventSlug}`}>
-                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
-                      {/* Thumbnail or Info Card */}
-                      <div className="relative h-48 overflow-hidden rounded-t-lg">
-                        {thumbnailUrl ? (
-                          <img
-                            src={thumbnailUrl || "/placeholder.svg"}
-                            alt={event.event_name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white p-4">
-                            <div className="text-center">
-                              <Calendar className="h-8 w-8 mx-auto mb-2" />
-                              <h4 className="font-semibold text-sm mb-1">{event.event_type}</h4>
-                              <p className="text-xs opacity-90">{event.event_category}</p>
+                  return (
+                    <motion.div
+                      key={event.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      className="group"
+                    >
+                      <Link href={`/event/${eventSlug}`}>
+                        <div className="bg-white/60 backdrop-blur-sm rounded-2xl border border-white/30 overflow-hidden hover:bg-white/80 hover:border-white/50 transition-all duration-500 hover:shadow-2xl h-full shadow-xl">
+                          {/* Thumbnail or Info Card */}
+                          <div className="relative h-48 overflow-hidden">
+                            {thumbnailUrl ? (
+                              <img
+                                src={thumbnailUrl || "/placeholder.svg"}
+                                alt={event.event_name}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                              />
+                            ) : (
+                              <div
+                                className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center text-white p-6 relative overflow-hidden`}
+                              >
+                                <div className="absolute inset-0 bg-black/10" />
+                                <div className="text-center relative z-10">
+                                  <Calendar className="h-10 w-10 mx-auto mb-3 opacity-90" />
+                                  <h4 className="font-semibold text-base mb-2">{event.event_type}</h4>
+                                  <p className="text-sm opacity-80">{event.event_category}</p>
+                                </div>
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
+                                  className="absolute -top-4 -right-4 w-16 h-16 border border-white/20 rounded-full"
+                                />
+                              </div>
+                            )}
+                            <div className="absolute top-4 left-4">
+                              <Badge className={`bg-neutral-950 text-white border-0 shadow-lg`}>
+                                {event.event_type}
+                              </Badge>
                             </div>
                           </div>
-                        )}
-                        <div className="absolute top-3 left-3">
-                          <Badge className={getEventTypeColor(event.event_type)}>{event.event_type}</Badge>
+
+                          <div className="p-6">
+                            <div className="mb-4">
+                              <h4 className="text-lg font-semibold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 mb-2">
+                                {event.event_name}
+                              </h4>
+                              <p className="text-sm text-gray-600 font-medium">{event.event_category}</p>
+                            </div>
+
+                            <div className="space-y-3 mb-6">
+                              <div className="flex items-center text-sm text-gray-600">
+                                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+                                  <MapPin className="h-4 w-4 text-purple-600" />
+                                </div>
+                                <span className="truncate font-medium">
+                                  {event.city && event.country
+                                    ? `${event.city}, ${event.country}`
+                                    : event.country || "Location TBA"}
+                                </span>
+                              </div>
+                              <div className="flex items-center text-sm text-gray-600">
+                                <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center mr-3">
+                                  <Calendar className="h-4 w-4 text-purple-600" />
+                                </div>
+                                <span className="font-medium">
+                                  {formatDate(event.event_start_date)}
+                                  {event.event_end_date && event.event_end_date !== event.event_start_date && (
+                                    <span> - {formatDate(event.event_end_date)}</span>
+                                  )}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="pt-4 border-t border-gray-100">
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium bg-neutral-900 bg-clip-text text-transparent">
+                                  View Details
+                                </span>
+                                <motion.div
+                                  whileHover={{ x: 5 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="w-8 h-8 rounded-lg bg-neutral-950 flex items-center justify-center"
+                                >
+                                  <ArrowRight className="h-4 w-4 text-white" />
+                                </motion.div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
-                          {event.event_name}
-                        </CardTitle>
-                        <CardDescription className="text-sm">{event.event_category}</CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="pt-0">
-                        <div className="space-y-3">
-                          {event.event_topic && (
-                            <div className="text-sm text-gray-600">
-                              <span className="font-medium">Topic:</span> {event.event_topic}
-                            </div>
-                          )}
-
-                          <div className="flex items-center text-sm text-gray-600">
-                            <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span className="truncate">
-                              {event.city && event.country
-                                ? `${event.city}, ${event.country}`
-                                : event.country || "Location TBA"}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center text-sm text-gray-600">
-                            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
-                            <span>
-                              {formatDate(event.event_start_date)}
-                              {event.event_end_date && event.event_end_date !== event.event_start_date && (
-                                <span> - {formatDate(event.event_end_date)}</span>
-                              )}
-                            </span>
-                          </div>
-
-                          {event.abstract_deadline && (
-                            <div className="flex items-center text-sm text-orange-600">
-                              <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
-                              <span>Deadline: {formatDate(event.abstract_deadline)}</span>
-                            </div>
-                          )}
-
-                          {event.organizing_society && (
-                            <div className="flex items-center text-sm text-gray-600">
-                              <Users className="h-4 w-4 mr-2 flex-shrink-0" />
-                              <span className="truncate">{event.organizing_society}</span>
-                            </div>
-                          )}
-
-                          {event.short_description && (
-                            <p className="text-sm text-gray-600 line-clamp-2">
-                              {event.short_description.replace(/<[^>]*>/g, "").substring(0, 100)}...
-                            </p>
-                          )}
-                        </div>
-
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-blue-600 font-medium group-hover:text-blue-800">
-                              View Details
-                            </span>
-                            <ArrowRight className="h-4 w-4 text-blue-600 group-hover:text-blue-800 group-hover:translate-x-1 transition-all" />
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                )
-              })}
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </AnimatePresence>
             </div>
 
             {/* View More Button */}
-            <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="text-center"
+            >
               <Link href="/search/all">
-                <Button size="lg" variant="outline" className="px-8 bg-transparent">
-                  View All Events
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    className="px-8 py-4 bg-white/60 backdrop-blur-sm border border-white/30 hover:bg-white/80 hover:border-white/50 text-gray-700 hover:text-gray-900 transition-all duration-300 rounded-xl shadow-lg hover:shadow-xl"
+                  >
+                    <Sparkles className="h-5 w-5 mr-2" />
+                    View All Events
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </Button>
+                </motion.div>
               </Link>
-            </div>
+            </motion.div>
           </>
         )}
       </div>
